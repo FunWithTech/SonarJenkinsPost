@@ -2,18 +2,20 @@ version: '2'
 #service that will run
 services:
   jenkins:
-  #its pulling Jenkins image
+  #its pulling Jenkins image, we can use our ow version 
     image: jenkins/jenkins:lts
     #ports to expose 
     ports:
       - "8080:8080"
       - "50000:50000"
+      #use network jenkins
     networks:
       - jenkins
       #volues to mount
     volumes:
       - /var/jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+
       #service posgres
   postgres:
     image: postgres:9.6
@@ -22,8 +24,10 @@ services:
     environment:
       POSTGRES_USER: sonar
       POSTGRES_PASSWORD: sonarpasswd
+      #we added a volue here, so all the data will be on the host pc also 
     volumes:
       - /var/postgres-data:/var/lib/postgresql/data
+
       #service to run 
   sonarqube:
     image: sonarqube:lts
@@ -34,6 +38,7 @@ services:
       - jenkins
       #enviroment variables 
     environment:
+    #creds for postgrep database where sonar will store info. 
       SONARQUBE_JDBC_USERNAME: sonar
       SONARQUBE_JDBC_PASSWORD: sonarpasswd
       SONARQUBE_JDBC_URL: "jdbc:postgresql://postgres:5432/sonar"
